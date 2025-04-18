@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Event } from '../../../models/event.model';
+import { Event, EventStatus } from '../../../models/event.model';
 import { ImageComponent } from '../image/image.component';
 
 @Component({
@@ -10,6 +10,9 @@ import { ImageComponent } from '../image/image.component';
   imports: [CommonModule, RouterLink, ImageComponent],
   template: `
     <div class="event-card">
+      <div class="event-status" [ngClass]="getStatusClass()">
+        {{ getStatusText() }}
+      </div>
       <app-image
         [src]="getImageUrl(event.imageUrl)"
         [alt]="event.title"
@@ -53,9 +56,42 @@ import { ImageComponent } from '../image/image.component';
       border-radius: var(--border-radius-lg);
       overflow: hidden;
       transition: var(--transition-base);
+      position: relative;
 
       &:hover {
         transform: translateY(-4px);
+      }
+
+      .event-status {
+        position: absolute;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+        z-index: 1;
+        color: white;
+
+        &.status-draft {
+          background-color: #ffc107;
+        }
+
+        &.status-published {
+          background-color: #28a745;
+        }
+
+        &.status-cancelled {
+          background-color: #dc3545;
+        }
+
+        &.status-sold-out {
+          background-color: #dc3545;
+        }
+
+        &.status-postponed {
+          background-color: #ffc107;
+        }
       }
     }
 
@@ -111,12 +147,48 @@ export class EventCardComponent {
       return '/assets/images/placeholder.png';
     }
     
-    // Si l'URL commence déjà par /assets, on la retourne telle quelle
     if (imageUrl.startsWith('/assets')) {
       return imageUrl;
     }
     
-    // Sinon, on ajoute le préfixe /assets/images/events/
     return `/assets/images/events/${imageUrl}`;
+  }
+
+  getStatusClass(): string {
+    if (!this.event.published) {
+      return 'status-draft';
+    }
+
+    switch (this.event.status) {
+      case EventStatus.PUBLISHED:
+        return 'status-published';
+      case EventStatus.CANCELLED:
+        return 'status-cancelled';
+      case EventStatus.SOLD_OUT:
+        return 'status-sold-out';
+      case EventStatus.POSTPONED:
+        return 'status-postponed';
+      default:
+        return 'status-draft';
+    }
+  }
+
+  getStatusText(): string {
+    if (!this.event.published) {
+      return 'Brouillon';
+    }
+
+    switch (this.event.status) {
+      case EventStatus.PUBLISHED:
+        return 'Publié';
+      case EventStatus.CANCELLED:
+        return 'Annulé';
+      case EventStatus.SOLD_OUT:
+        return 'Complet';
+      case EventStatus.POSTPONED:
+        return 'Reporté';
+      default:
+        return 'Brouillon';
+    }
   }
 } 

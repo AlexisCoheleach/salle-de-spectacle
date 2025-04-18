@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventCardComponent } from '../event-card/event-card.component';
 import { MockEventService } from '../../../services/mock-event.service';
-import { Event } from '../../../models/event.model';
+import { Event, EventStatus } from '../../../models/event.model';
 
 @Component({
   selector: 'app-event-list',
@@ -101,12 +101,14 @@ import { Event } from '../../../models/event.model';
     }
   `]
 })
-export class EventListComponent implements OnInit {
-  events: Event[] = [];
-  filteredEvents: Event[] = [];
+export class EventListComponent {
+  @Input() events: Event[] = [];
+  @Output() eventSelected = new EventEmitter<Event>();
+
   searchTerm = '';
   selectedLieu = '';
   maxPrix: number | null = null;
+  filteredEvents: Event[] = [];
 
   constructor(private eventService: MockEventService) {}
 
@@ -133,5 +135,43 @@ export class EventListComponent implements OnInit {
 
       return matchesSearch && matchesLieu && matchesPrix;
     });
+  }
+
+  getStatusClass(event: Event): string {
+    if (!event.published) {
+      return 'status-draft';
+    }
+
+    switch (event.status) {
+      case EventStatus.PUBLISHED:
+        return 'status-published';
+      case EventStatus.CANCELLED:
+        return 'status-cancelled';
+      case EventStatus.SOLD_OUT:
+        return 'status-sold-out';
+      case EventStatus.POSTPONED:
+        return 'status-postponed';
+      default:
+        return 'status-draft';
+    }
+  }
+
+  getStatusText(event: Event): string {
+    if (!event.published) {
+      return 'Brouillon';
+    }
+
+    switch (event.status) {
+      case EventStatus.PUBLISHED:
+        return 'Publié';
+      case EventStatus.CANCELLED:
+        return 'Annulé';
+      case EventStatus.SOLD_OUT:
+        return 'Complet';
+      case EventStatus.POSTPONED:
+        return 'Reporté';
+      default:
+        return 'Brouillon';
+    }
   }
 } 

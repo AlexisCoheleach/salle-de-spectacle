@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
-import { Event } from '../models/event.model';
+import { Event, EventCategory, EventStatus } from '../models/event.model';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -11,33 +11,94 @@ export class MockEventService {
   private events: Event[] = [
     {
       id: '1',
-      title: 'Concert Jazz',
-      description: 'Un concert de jazz exceptionnel avec des artistes renommés.',
+      title: 'Concert de Jazz',
+      description: 'Un concert exceptionnel avec les meilleurs musiciens de jazz de la région.',
       date: '2024-04-15',
-      location: 'Salle de concert principale',
+      time: '20:00',
+      duration: 120,
+      location: 'Salle des Fêtes',
+      address: '123 Rue de la Musique',
+      city: 'Paris',
+      postalCode: '75001',
       price: 25,
-      imageUrl: '/assets/images/concert-jazz.jpg',
-      published: true
+      reducedPrice: 15,
+      maxCapacity: 200,
+      availableSeats: 150,
+      imageUrl: 'assets/images/events/jazz-concert.jpg',
+      category: EventCategory.CONCERT,
+      artists: [
+        {
+          id: '1',
+          name: 'John Smith',
+          role: 'Pianiste',
+          bio: 'Pianiste de jazz renommé avec plus de 20 ans d\'expérience.',
+          imageUrl: 'assets/images/artists/john-smith.jpg'
+        }
+      ],
+      published: true,
+      createdAt: '2024-03-01T10:00:00Z',
+      updatedAt: '2024-03-01T10:00:00Z',
+      createdBy: 'admin1',
+      tags: ['jazz', 'concert', 'musique'],
+      status: EventStatus.PUBLISHED
     },
     {
       id: '2',
-      title: 'Théâtre Classique',
-      description: 'Une pièce de théâtre classique interprétée par une troupe talentueuse.',
+      title: 'Pièce de Théâtre',
+      description: 'Une adaptation moderne d\'une pièce classique.',
       date: '2024-04-20',
-      location: 'Grand Théâtre',
+      time: '19:30',
+      duration: 90,
+      location: 'Théâtre Municipal',
+      address: '456 Avenue des Arts',
+      city: 'Lyon',
+      postalCode: '69001',
       price: 30,
-      imageUrl: '/assets/images/theatre-classique.jpg',
-      published: true
+      reducedPrice: 20,
+      maxCapacity: 150,
+      availableSeats: 100,
+      imageUrl: 'assets/images/events/theatre-play.jpg',
+      category: EventCategory.THEATRE,
+      artists: [
+        {
+          id: '2',
+          name: 'Marie Dupont',
+          role: 'Actrice principale',
+          bio: 'Actrice primée avec une longue carrière au théâtre.',
+          imageUrl: 'assets/images/artists/marie-dupont.jpg'
+        }
+      ],
+      published: true,
+      createdAt: '2024-03-02T11:00:00Z',
+      updatedAt: '2024-03-02T11:00:00Z',
+      createdBy: 'admin2',
+      tags: ['théâtre', 'drame', 'classique'],
+      status: EventStatus.PUBLISHED
     },
     {
       id: '3',
       title: 'Spectacle de Danse',
       description: 'Un spectacle de danse contemporaine captivant.',
       date: '2024-04-25',
+      time: '20:00',
+      duration: 90,
       location: 'Studio de danse',
+      address: '789 Rue de la Danse',
+      city: 'Marseille',
+      postalCode: '13001',
       price: 20,
+      reducedPrice: 15,
+      maxCapacity: 100,
+      availableSeats: 100,
       imageUrl: '/assets/images/danse-contemporaine.jpg',
-      published: false
+      category: EventCategory.DANSE,
+      artists: [],
+      tags: ['danse', 'contemporain'],
+      published: false,
+      createdAt: '2024-03-03T12:00:00Z',
+      updatedAt: '2024-03-03T12:00:00Z',
+      createdBy: 'admin3',
+      status: EventStatus.DRAFT
     }
   ];
 
@@ -67,26 +128,68 @@ export class MockEventService {
     return of(event).pipe(delay(300));
   }
 
-  addEvent(event: Omit<Event, 'id'>): Promise<Event> {
+  addEvent(event: Event): Observable<Event> {
     const newEvent: Event = {
       ...event,
-      id: (this.events.length + 1).toString()
+      id: Math.random().toString(36).substr(2, 9),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      time: event.time || '20:00',
+      duration: event.duration || 120,
+      address: event.address || '',
+      city: event.city || '',
+      postalCode: event.postalCode || '',
+      reducedPrice: event.reducedPrice || 0,
+      maxCapacity: event.maxCapacity || 100,
+      availableSeats: event.availableSeats || event.maxCapacity || 100,
+      category: event.category || EventCategory.CONCERT,
+      artists: event.artists || [],
+      tags: event.tags || [],
+      createdBy: event.createdBy || 'admin',
+      status: event.status || EventStatus.DRAFT,
+      published: event.published || false
     };
+
     this.events.push(newEvent);
-    return Promise.resolve(newEvent);
+    return of(newEvent);
   }
 
-  deleteEvent(id: string): Promise<void> {
-    this.events = this.events.filter(event => event.id !== id);
-    return Promise.resolve();
-  }
-
-  updateEvent(id: string, data: Partial<Event>): Promise<void> {
-    const index = this.events.findIndex(event => event.id === id);
-    if (index !== -1) {
-      this.events[index] = { ...this.events[index], ...data };
+  deleteEvent(id: string): Observable<void> {
+    const index = this.events.findIndex(e => e.id === id);
+    if (index === -1) {
+      throw new Error(`Event with id ${id} not found`);
     }
-    return Promise.resolve();
+    this.events.splice(index, 1);
+    return of(undefined);
+  }
+
+  updateEvent(event: Event): Observable<Event> {
+    const index = this.events.findIndex(e => e.id === event.id);
+    if (index === -1) {
+      return throwError(() => new Error('Event not found'));
+    }
+
+    const updatedEvent: Event = {
+      ...event,
+      updatedAt: new Date().toISOString(),
+      time: event.time || '20:00',
+      duration: event.duration || 120,
+      address: event.address || '',
+      city: event.city || '',
+      postalCode: event.postalCode || '',
+      reducedPrice: event.reducedPrice || 0,
+      maxCapacity: event.maxCapacity || 100,
+      availableSeats: event.availableSeats || event.maxCapacity || 100,
+      category: event.category || EventCategory.CONCERT,
+      artists: event.artists || [],
+      tags: event.tags || [],
+      createdBy: event.createdBy || 'admin',
+      status: event.status || EventStatus.DRAFT,
+      published: event.published || false
+    };
+
+    this.events[index] = updatedEvent;
+    return of(updatedEvent);
   }
 
   createEvent(event: Omit<Event, 'id'>): Observable<Event> {

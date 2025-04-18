@@ -5,7 +5,7 @@ import { MockEventService } from '../../services/mock-event.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { Subscription, firstValueFrom } from 'rxjs';
-import { Event } from '../../models/event.model';
+import { Event, EventStatus } from '../../models/event.model';
 
 @Component({
   selector: 'app-admin',
@@ -35,8 +35,8 @@ import { Event } from '../../models/event.model';
             <div class="event-card" *ngFor="let event of events">
               <div class="event-header">
                 <img [src]="event.imageUrl || 'assets/images/placeholder.jpg'" [alt]="event.title">
-                <div class="event-status" [class.published]="event.published">
-                  {{ event.published ? 'Publié' : 'Brouillon' }}
+                <div class="event-status" [ngClass]="getStatusClass(event)">
+                  <span class="status-badge">{{ getStatusText(event) }}</span>
                 </div>
               </div>
               
@@ -133,15 +133,35 @@ import { Event } from '../../models/event.model';
         position: absolute;
         top: var(--spacing-sm);
         right: var(--spacing-sm);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--border-radius-sm);
-        background-color: var(--background-card);
-        color: var(--text-secondary);
-        font-size: 0.875rem;
+        z-index: 1;
 
-        &.published {
-          background-color: #28a745;
+        .status-badge {
+          display: inline-block;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.75rem;
+          font-weight: 500;
           color: white;
+        }
+
+        &.status-draft .status-badge {
+          background-color: #ffc107;
+        }
+
+        &.status-published .status-badge {
+          background-color: #28a745;
+        }
+
+        &.status-cancelled .status-badge {
+          background-color: #dc3545;
+        }
+
+        &.status-sold-out .status-badge {
+          background-color: #dc3545;
+        }
+
+        &.status-postponed .status-badge {
+          background-color: #ffc107;
         }
       }
     }
@@ -238,5 +258,43 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   logout() {
     this.authService.logout().subscribe();
+  }
+
+  getStatusClass(event: Event): string {
+    if (!event.published) {
+      return 'status-draft';
+    }
+
+    switch (event.status) {
+      case EventStatus.PUBLISHED:
+        return 'status-published';
+      case EventStatus.CANCELLED:
+        return 'status-cancelled';
+      case EventStatus.SOLD_OUT:
+        return 'status-sold-out';
+      case EventStatus.POSTPONED:
+        return 'status-postponed';
+      default:
+        return 'status-draft';
+    }
+  }
+
+  getStatusText(event: Event): string {
+    if (!event.published) {
+      return 'Brouillon';
+    }
+
+    switch (event.status) {
+      case EventStatus.PUBLISHED:
+        return 'Publié';
+      case EventStatus.CANCELLED:
+        return 'Annulé';
+      case EventStatus.SOLD_OUT:
+        return 'Complet';
+      case EventStatus.POSTPONED:
+        return 'Reporté';
+      default:
+        return 'Brouillon';
+    }
   }
 } 

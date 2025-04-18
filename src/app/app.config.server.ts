@@ -1,14 +1,43 @@
-import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideServerRendering } from '@angular/platform-server';
-import { provideServerRoutesConfig } from '@angular/ssr';
-import { appConfig } from './app.config';
-import { serverRoutes } from './app.routes.server';
+import { HttpClient } from '@angular/common/http';
+import { MockEventService } from './services/mock-event.service';
+import { AuthService } from './services/auth.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes';
 
-const serverConfig: ApplicationConfig = {
+export const config: ApplicationConfig = {
   providers: [
     provideServerRendering(),
-    provideServerRoutesConfig(serverRoutes)
+    provideHttpClient(),
+    provideAnimations(),
+    provideRouter(routes),
+    {
+      provide: AuthService,
+      useValue: {
+        isAuthenticated: false,
+        currentUser: null,
+        login: () => Promise.resolve(),
+        logout: () => Promise.resolve(),
+        getCurrentUser: () => Promise.resolve(null)
+      }
+    },
+    MockEventService
   ]
 };
 
-export const config = mergeApplicationConfig(appConfig, serverConfig);
+export async function getPrerenderParams(route: string): Promise<string[]> {
+  if (route === 'evenements/:id') {
+    // Retourner une liste statique d'IDs pour le prerendering
+    return ['1', '2', '3'];
+  }
+  
+  if (route === 'admin/events/:id/edit') {
+    // Retourner une liste statique d'IDs pour le prerendering
+    return ['1', '2', '3'];
+  }
+
+  return [];
+}
