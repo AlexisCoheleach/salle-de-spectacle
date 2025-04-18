@@ -1,4 +1,15 @@
-<section>
-  <h1>Bienvenue sur le site de la salle de spectacles</h1>
-  <p>Projet Angular 19 - Standalone - Firebase ready</p>
+<section class="accueil">
+  <div class="container">
+    <h2>Évènements à venir</h2>
+
+    <div *ngIf="isLoading" class="loading">
+      <p>Chargement des événements...</p>
+    </div>
+    
+    <div *ngIf="error" class="error">
+      <p>{{ error }}</p>
+    </div>
+
+    <app-event-list *ngIf="!isLoading && !error" [events]="events"></app-event-list>
+  </div>
 </section>

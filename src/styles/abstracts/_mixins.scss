@@ -1,0 +1,64 @@
+@import 'variables';
+
+// Breakpoint mixins
+@mixin breakpoint-up($breakpoint) {
+  @media (min-width: $breakpoint) {
+    @content;
+  }
+}
+
+@mixin breakpoint-down($breakpoint) {
+  $value: $breakpoint - 0.02;
+  @media (max-width: $value) {
+    @content;
+  }
+}
+
+// Flexbox utilities
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Typography utilities
+@mixin heading-1 {
+  font-family: $font-primary;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@mixin heading-2 {
+  font-family: $font-primary;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+// Common patterns
+@mixin card {
+  background-color: var(--background-card);
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: $transition-theme;
+}
+
+@mixin button-base {
+  font-family: $font-primary;
+  font-weight: 600;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-md;
+  border: none;
+  cursor: pointer;
+  transition: $transition-base;
+  text-decoration: none;
+  display: inline-block;
+} 

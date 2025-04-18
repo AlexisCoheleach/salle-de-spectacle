@@ -1,0 +1,45 @@
+// Colors
+$primary: #3F51B5;
+$primary-dark: darken($primary, 10%);
+$accent: #FFC107;
+$background-light: #F5F5F5;
+$background-white: #FFFFFF;
+$background-dark: #121212;
+$text-primary: #212121;
+$text-secondary: #666666;
+$footer-dark: #1F1F1F;
+
+// Typography
+$font-primary: 'Poppins', sans-serif;
+$font-secondary: 'Inter', sans-serif;
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// Border radius
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+
+// Transitions
+$transition-base: all 0.2s ease-in-out;
+$transition-theme: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Z-index
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070; 

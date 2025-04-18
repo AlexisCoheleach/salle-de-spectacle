@@ -1,1 +1,120 @@
 /* You can add global styles to this file, and also import other style files */
+
+// Import abstracts
+@import 'styles/abstracts/variables';
+@import 'styles/abstracts/mixins';
+
+// Import fonts
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+// Root variables
+:root {
+  // Colors
+  --primary: #{$primary};
+  --primary-dark: #{$primary-dark};
+  --accent: #{$accent};
+  --background: #{$background-light};
+  --background-card: #{$background-white};
+  --text-primary: #{$text-primary};
+  --text-secondary: #{$text-secondary};
+  --footer-dark: #{$footer-dark};
+
+  // Spacing
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+
+  // Border radius
+  --border-radius-sm: #{$border-radius-sm};
+  --border-radius-md: #{$border-radius-md};
+  --border-radius-lg: #{$border-radius-lg};
+
+  // Transitions
+  --transition-base: #{$transition-base};
+  --transition-theme: #{$transition-theme};
+}
+
+// Dark theme
+[data-theme="dark"] {
+  --background: #{$background-dark};
+  --background-card: #{$footer-dark};
+  --text-primary: #{$background-white};
+  --text-secondary: #{rgba($background-white, 0.7)};
+}
+
+// Reset and base styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-secondary;
+  background-color: var(--background);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: var(--transition-theme);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-primary;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+// Button styles
+.btn {
+  @include button-base;
+  
+  &-primary {
+    background-color: var(--primary);
+    color: $background-white;
+    
+    &:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  &-secondary {
+    background-color: transparent;
+    border: 2px solid var(--primary);
+    color: var(--text-primary);
+    
+    &:hover {
+      background-color: rgba($primary, 0.1);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Card styles
+.card {
+  @include card;
+}
+
+// Container
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+// Grid system
+.grid {
+  display: grid;
+  gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}

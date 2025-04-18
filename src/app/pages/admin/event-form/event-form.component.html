@@ -1,0 +1,13 @@
+<div class="form-group">
+  <label for="image">Image de l'événement</label>
+  <input 
+    type="file" 
+    id="image" 
+    (change)="onFileSelected($event)"
+    accept="image/*"
+    class="form-control"
+  >
+  <div *ngIf="previewUrl" class="image-preview">
+    <img [src]="previewUrl" alt="Aperçu de l'image">
+  </div>
+</div> 
